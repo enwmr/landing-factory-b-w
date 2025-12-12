@@ -1,0 +1,33 @@
+name: Generate landing pages daily
+
+on:
+  schedule:
+    - cron: "0 4 * * *"
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Generate landing pages
+        run: python scripts/generate_pages.py
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "chore: generate landing pages"
+          title: "chore: daily landing pages update"
+          body: |
+            Automatischer Lauf der Landingpage-Generierung.
+            - erzeugt bis zu 40 neue Seiten pro Tag
+            - aktualisiert data/generated.json zur Nachverfolgung
+          branch: automation/daily-landing-pages
+          delete-branch: true
